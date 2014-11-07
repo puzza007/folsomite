@@ -5,32 +5,21 @@ metrics (https://github.com/codahale/metrics/).
 
 [Graphite][2] is a realtime graphing system.
 
-[Riemann][3] is a monitoring system suitable for distributed systems.
-
-
 Folsomite runs in your Erlang virtual machine, periodically aggregates
-all present Folsom metrics and forwards them to your Graphite and
-Riemann services.
+all present Folsom metrics and forwards them to your Graphite server.
 
-
-Forwarding to Riemann uses the zeta library from reifyhealth [on
-github][4].
-
-The canonical location for the source code is [on github][5]. The
-software is copyrighted 2012 [Campanja AB][6] and distributed under
-the [Apache License, Version 2.0][7].
+The canonical location for the source code is [on github][3]. The
+software is copyrighted 2012 [Campanja AB][4] and distributed under
+the [Apache License, Version 2.0][5].
 
 
 Comments and patches always welcome!
 
-
 [1]: https://github.com/boundary/folsom
 [2]: http://graphite.wikidot.com/
-[3]: http://aphyr.github.com/riemann/index.html
-[4]: https://github.com/reifyhealth/zeta
-[5]: https://github.com/campanja/folsomite/
-[6]: http://www.campanja.com/
-[7]: http://www.apache.org/licenses/LICENSE-2.0.html
+[3]: https://github.com/campanja/folsomite/
+[4]: http://www.campanja.com/
+[5]: http://www.apache.org/licenses/LICENSE-2.0.html
 
 
 #### Building and running
@@ -63,11 +52,7 @@ You can start it from the shell:
         {folsomite,
          [{graphite_host, "graphite.example.com"},
           {node_key, "billing-prod-us-east-1"}
-         ]},
-        {zeta,
-         [{clients,
-           [{default,
-             {"riemann.example.com", 5555, {keepalive, 180000}}}]}]}
+         ]}
        ]}
      ]}.
 

@@ -60,7 +60,7 @@ handle_cast(Cast, State) ->
     {noreply, State}.
 
 handle_info(connect, #state{host=Host, port=Port} = State) ->
-    error_logger:info_msg("Folsomite attempting to reconnect: ~p:~p", [Host, Port]),
+    error_logger:info_msg("Folsomite attempting to reconnect: ~s:~p", [Host, Port]),
     case gen_tcp:connect(Host, Port, [binary, {active, false}], 5000) of
         {ok, Sock} ->
             {noreply, State#state{socket=Sock}};

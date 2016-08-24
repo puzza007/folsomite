@@ -28,6 +28,7 @@
 -record(state, {flush_interval :: integer(),
                 node_key       :: string(),
                 node_prefix    :: string(),
+                metric_prefix  :: string(),
                 timer_ref      :: reference()}).
 
 
@@ -40,9 +41,16 @@ init(no_arg) ->
     process_flag(trap_exit, true),
     FlushInterval = get_env(flush_interval),
     Ref = erlang:start_timer(FlushInterval, self(), ?TIMER_MSG),
+    MetricPrefix = case application:get_env(?APP, metric_prefix, "") of
+                       "" ->
+                           "";
+                       Else when is_list(Else) ->
+                           Else ++ "."
+                   end,
     State = #state{flush_interval = FlushInterval,
                    node_key = node_key(),
                    node_prefix = node_prefix(),
+                   metric_prefix = MetricPrefix,
                    timer_ref = Ref},
     {ok, State}.
 
@@ -116,14 +124,14 @@ expand(X, NamePrefix) ->
 send_stats(State) ->
     Metrics = get_stats(),
     Timestamp = num2str(unixtime()),
-    Message = [format1(State#state.node_key, M, Timestamp) || M <- Metrics],
+    Message = [format1(State#state.metric_prefix, State#state.node_key, M, Timestamp) || M <- Metrics],
     case folsomite_graphite_client_sup:get_client() of
         {ok, Socket} -> folsomite_graphite_client:send(Socket, Message);
         {error, _} = Error -> Error
     end.
 
-format1(Base, {K, V}, Timestamp) ->
-    ["folsomite.", Base, ".", space2dot(K), " ", a2l(V), " ", Timestamp, "\n"].
+format1(Prefix, Base, {K, V}, Timestamp) ->
+    [Prefix, "folsomite.", Base, ".", space2dot(K), " ", a2l(V), " ", Timestamp, "\n"].
 
 num2str(NN) -> lists:flatten(io_lib:format("~w",[NN])).
 unixtime()  -> {Meg, S, _} = os:timestamp(), Meg*1000000 + S.
